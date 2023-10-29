@@ -191,65 +191,51 @@ public:
             return result[x].close;
         };
 
-        enum state {
-            just_called,
-            iterating_children
-        };
         struct stack_frame {
-            state ip;
             uint node;
             uint parent;
             uint next_child;
         };
         // allocate the stack on the heap to avoid stack overflow
         std::stack<stack_frame> call_stack;
-        call_stack.push({just_called, root, UINT32_MAX, UINT32_MAX});
-
         uint next_open = 0;
 
+        const auto call = [&](uint node, uint parent) {
+            assert(open(node) == UINT32_MAX);
+            assert(close(node) == UINT32_MAX);
+            open(node) = close(node) = next_open++;
+            call_stack.push({node, parent, 0});
+        };
+
+        call(root, UINT32_MAX);
+
         while(!call_stack.empty()) {
-            switch(call_stack.top().ip) {
-                case just_called: {
-                    uint node = call_stack.top().node;
-                    assert(open(node) == UINT32_MAX);
-                    assert(close(node) == UINT32_MAX);
-                    open(node) = close(node) = next_open++;
-                    assert(call_stack.top().next_child == UINT32_MAX);
-                    call_stack.top().next_child = 0;
-                    call_stack.top().ip = iterating_children;
-                    break;
+            uint node = call_stack.top().node;
+            uint child_index = call_stack.top().next_child;
+            assert(child_index <= nodes[node].out.size());
+
+            if(child_index == nodes[node].out.size()) {
+                // end of this call
+                call_stack.pop();
+                if(!call_stack.empty()) {
+                    // update parent's close time
+                    uint parent = call_stack.top().node;
+                    close(parent) = std::min(close(parent), close(node));
                 }
-                case iterating_children: {
-                    uint node = call_stack.top().node;
-                    uint chld_index = call_stack.top().next_child;
-                    assert(chld_index <= nodes[node].out.size());
-                    if(chld_index == nodes[node].out.size()) {
-                        call_stack.pop();
-                        if(!call_stack.empty()) {
-                            uint parent = call_stack.top().node;
-                            close(parent) = std::min(close(parent), close(node));
-                        }
-                        break;
-                    } else {
-                        uint chld = nodes[node].out[chld_index].dst;
-                        call_stack.top().next_child++;
-                        if(chld == call_stack.top().parent) {
-                            break;
-                        }
-                        if(open(chld) == UINT32_MAX) {
-                            // recurse
-                            call_stack.push({just_called, chld, node, UINT32_MAX});
-                            break;
-                        } else {
-                            close(node) = std::min(close(node), open(chld));
-                            break;
-                        }
-                    }
-                    assert(false); // unreachable
-                }
-                default: {
-                    assert(false); // unreachable
-                }
+                continue; // return from this call
+            }
+
+            uint child = nodes[node].out[child_index].dst;
+            call_stack.top().next_child++; // update index for next iteration
+
+            if(child == call_stack.top().parent) {
+                continue; // continue to next iteration
+            } else if(open(child) == UINT32_MAX) {
+                call(child, node);
+                continue; // recurse
+            } else {
+                close(node) = std::min(close(node), open(child));
+                continue; // continue to next iteration
             }
         }
 
