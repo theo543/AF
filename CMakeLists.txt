@@ -20,3 +20,8 @@ add_custom_command(TARGET padure POST_BUILD
         ${CMAKE_CURRENT_SOURCE_DIR}/padure.in ${CMAKE_CURRENT_BINARY_DIR}/padure.in
 )
 add_executable(test_critical_connections test_critical_connections.cpp)
+add_executable(patrol2 patrol2.cpp)
+add_custom_command(TARGET patrol2 POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/patrol2.in ${CMAKE_CURRENT_BINARY_DIR}/patrol2.in
+)
