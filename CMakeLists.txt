@@ -14,3 +14,8 @@ add_executable(test_shortest_bridge test_shortest_bridge.cpp)
 add_executable(test_eqsat test_eqsat.cpp)
 add_executable(directed_paths 1144F_directed_paths.cpp)
 add_executable(marked_nodes_diameter 1881F_marked_nodes_diameter.cpp)
+add_executable(padure padure.cpp)
+add_custom_command(TARGET padure POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/padure.in ${CMAKE_CURRENT_BINARY_DIR}/padure.in
+)
