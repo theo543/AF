@@ -35,22 +35,13 @@ int main() {
     };
 
     std::vector<patrol> patrols_data(nr_patrols);
-    std::vector<int> patrols_on_node(nr_nodes, 0);
+    std::vector<bool> patrols_on_node(nr_nodes, 0);
 
-    const auto all_patrols_returned = [&]() {
-        for(const auto &p : patrols_data) {
-            if(p.current_node != 0) {
-                return false;
-            }
-        }
-        return true;
-    };
-
-    const auto advance_patrols = [](std::vector<patrol> &pd, std::vector<int> &pon) {
+    const auto advance_patrols = [](std::vector<patrol> &pd, std::vector<bool> &pon) {
+        std::fill(pon.begin(), pon.end(), false);
         for(auto &p : pd) {
-            pon[p.nodes[p.current_node]]--;
             p.current_node = (p.current_node + 1) % p.nodes.size();
-            pon[p.nodes[p.current_node]]++;
+            pon[p.nodes[p.current_node]] = true;
         }
     };
 
@@ -65,23 +56,19 @@ int main() {
             cin >> v;
             patrols_data[x].nodes.push_back(v);
         }
-        patrols_on_node[patrols_data[x].nodes[0]]++;
+        patrols_on_node[patrols_data[x].nodes[0]] = true;
     }
 
-    std::vector<patrol> patrols_data_future = patrols_data;
-    std::vector<int> patrols_on_node_future = patrols_on_node;
-
-    advance_patrols(patrols_data_future, patrols_on_node_future);
+    advance_patrols(patrols_data, patrols_on_node);
 
     graph g;
     g.grow(nr_nodes * total_copies);
     for(int copy = 0;copy < total_copies;copy++) {
-        assert(copy == 0 || !all_patrols_returned());
         int dst_copy = (copy + 1) % total_copies;
         int src_offset = copy * nr_nodes;
         int dst_offset = dst_copy * nr_nodes;
         const auto add_if_safe = [&](int a, int b) {
-            if(patrols_on_node_future[b] > 0) {
+            if(patrols_on_node[b]) {
                 return;
             }
             g.add_edge(src_offset + a, dst_offset + b);
@@ -97,10 +84,8 @@ int main() {
         for(uint x = 0;x < nr_nodes;x++) {
             add_if_safe(x, x);
         }
-        advance_patrols(patrols_data_future, patrols_on_node_future);
         advance_patrols(patrols_data, patrols_on_node);
     }
-    assert(all_patrols_returned());
     auto bfs = g.bfs_distances({0});
     uint shortest = UINT32_MAX;
     for(const auto &b : bfs) {
@@ -108,6 +93,9 @@ int main() {
             shortest = std::min(shortest, b.distance);
         }
     }
-    cout << shortest << '\n';
-    cout.flush();
+    if(shortest == UINT32_MAX) {
+        cout << "-1\n";
+    } else {
+        cout << shortest << '\n';
+    }
 }
