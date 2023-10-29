@@ -19,3 +19,4 @@ add_custom_command(TARGET padure POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/padure.in ${CMAKE_CURRENT_BINARY_DIR}/padure.in
 )
+add_executable(test_critical_connections test_critical_connections.cpp)

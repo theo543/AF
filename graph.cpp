@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <cassert>
 #include <queue>
+#include <stack>
 
 #define uint uint32_t
 
@@ -138,6 +139,7 @@ public:
         std::vector<bfs_result> bfs;
         std::vector<char> visited(sz, false);
         for(uint x : sources) {
+            assert(x < sz);
             bfs.push_back({x, 0});
             visited[x] = true;
         }
@@ -169,5 +171,88 @@ public:
             assert(comp[x] != UINT32_MAX);
         }
         return comp;
+    }
+
+    struct node_w_dfs_result {
+        uint open; // time we discovered this node
+        uint close; // node with lowest open time that we can reach from this node
+    };
+
+    // DFS to find open and close times for each node, UINT32_MAX if unreachable, single source
+    std::vector<node_w_dfs_result> dfs_open_close(uint root) {
+        uint sz = nr_nodes();
+        assert(root < sz);
+
+        std::vector<node_w_dfs_result> result(sz, {UINT32_MAX, UINT32_MAX});
+        const auto open = [&](uint x) -> uint& {
+            return result[x].open;
+        };
+        const auto close = [&](uint x) -> uint& {
+            return result[x].close;
+        };
+
+        enum state {
+            just_called,
+            iterating_children
+        };
+        struct stack_frame {
+            state ip;
+            uint node;
+            uint parent;
+            uint next_child;
+        };
+        // allocate the stack on the heap to avoid stack overflow
+        std::stack<stack_frame> call_stack;
+        call_stack.push({just_called, root, UINT32_MAX, UINT32_MAX});
+
+        uint next_open = 0;
+
+        while(!call_stack.empty()) {
+            switch(call_stack.top().ip) {
+                case just_called: {
+                    uint node = call_stack.top().node;
+                    assert(open(node) == UINT32_MAX);
+                    assert(close(node) == UINT32_MAX);
+                    open(node) = close(node) = next_open++;
+                    assert(call_stack.top().next_child == UINT32_MAX);
+                    call_stack.top().next_child = 0;
+                    call_stack.top().ip = iterating_children;
+                    break;
+                }
+                case iterating_children: {
+                    uint node = call_stack.top().node;
+                    uint chld_index = call_stack.top().next_child;
+                    assert(chld_index <= nodes[node].out.size());
+                    if(chld_index == nodes[node].out.size()) {
+                        call_stack.pop();
+                        if(!call_stack.empty()) {
+                            uint parent = call_stack.top().node;
+                            close(parent) = std::min(close(parent), close(node));
+                        }
+                        break;
+                    } else {
+                        uint chld = nodes[node].out[chld_index].dst;
+                        call_stack.top().next_child++;
+                        if(chld == call_stack.top().parent) {
+                            break;
+                        }
+                        if(open(chld) == UINT32_MAX) {
+                            // recurse
+                            call_stack.push({just_called, chld, node, UINT32_MAX});
+                            break;
+                        } else {
+                            close(node) = std::min(close(node), open(chld));
+                            break;
+                        }
+                    }
+                    assert(false); // unreachable
+                }
+                default: {
+                    assert(false); // unreachable
+                }
+            }
+        }
+
+        return result;
     }
 };
