@@ -100,7 +100,15 @@ public:
                     next_node++;
                     assert(next_node != sz);
                 }
+                // so that this works with undirected graphs, check neighbors of next_node since it may be connected
+                // to a colored node
                 col_vec[next_node] = A;
+                for(auto e : nodes[next_node].out) {
+                    if(col_vec[e.dst] == A) {
+                        col_vec[e.dst] = B;
+                        break;
+                    }
+                }
                 colored++;
                 color_from.push(next_node);
             }
