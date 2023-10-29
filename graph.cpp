@@ -119,4 +119,47 @@ public:
             }
         }
     }
+
+    struct bfs_result {
+        uint node;
+        uint distance;
+    };
+
+    std::vector<bfs_result> bfs_distances(const std::vector<uint> &sources) {
+        uint sz = nr_nodes();
+        std::vector<bfs_result> bfs;
+        std::vector<char> visited(sz, false);
+        for(uint x : sources) {
+            bfs.push_back({x, 0});
+            visited[x] = true;
+        }
+        for(uint x = 0;x < bfs.size();x++) {
+            for(auto e : nodes[bfs[x].node].out) {
+                if(!visited[e.dst]) {
+                    visited[e.dst] = true;
+                    bfs.push_back({e.dst, bfs[x].distance + 1});
+                }
+            }
+        }
+        return bfs;
+    }
+
+    std::vector<uint> components() {
+        uint sz = nr_nodes();
+        std::vector<uint> comp(sz, UINT32_MAX);
+        uint next_comp = 0;
+        for(uint x = 0;x < sz;x++) {
+            if(comp[x] == UINT32_MAX) {
+                auto bfs_result = bfs_distances({x});
+                for(auto r : bfs_result) {
+                    comp[r.node] = next_comp;
+                }
+            }
+            next_comp++;
+        }
+        for(uint x = 0;x < sz;x++) {
+            assert(comp[x] != UINT32_MAX);
+        }
+        return comp;
+    }
 };
