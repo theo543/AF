@@ -6,7 +6,7 @@ int main() {
     std::cin >> n >> m;
     graph g;
     g.grow(n);
-    std::vector<int> src(n), dst(n);
+    std::vector<int> src(m), dst(m);
     for(int i = 0;i < m;i++) {
         int a, b;
         std::cin >> a >> b;
