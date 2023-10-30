@@ -1,7 +1,5 @@
 #include <vector>
-#include <queue>
 #include <cassert>
-#include <cstdint>
 
 class Solution {
 public:
@@ -14,16 +12,13 @@ public:
         struct bfs_coord {
             int x, y;
             int dist;
-            bfs_coord(coord c) : x(c.x), y(c.y), dist(INT16_MAX) {}
-            bfs_coord(int x, int y) : x(x), y(y), dist(INT16_MAX) {}
-            bfs_coord(int x, int y, int d) : x(x), y(y), dist(d) {}
         };
 
         const coord dirs[] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
         const int n = grid.size();
 
         const auto in_bounds = [n](coord c) {
-            return !(c.x < 0 || c.x >= n || c.y < 0 || c.y >= n);
+            return c.x >= 0 && c.x < n && c.y >= 0 && c.y < n;
         };
 
         std::vector<std::vector<char>> island (n, std::vector<char>(n, 0));
@@ -33,13 +28,14 @@ public:
 
         for(int x = 0;x < n;x++) {
             for(int y = 0;y < n;y++) {
-                if(grid[x][y] != 0) {
+                if(grid[x][y] == 1 && island[x][y] == 0) {
                     assert(found_so_far < 2);
                     found_so_far++;
                     bfs.clear();
-                    bfs.push_back({x, y});
-                    for(size_t x = 0;x < bfs.size();x++) {
-                        bfs_coord node = bfs[x];
+                    bfs.push_back({x, y, -1});
+                    island[x][y] = found_so_far;
+                    for(size_t b_i = 0; b_i < bfs.size(); b_i++) {
+                        bfs_coord node = bfs[b_i];
                         for(const auto dir : dirs) {
                             coord neighbour = {node.x + dir.x, node.y + dir.y};
                             if(!in_bounds(neighbour) || grid[neighbour.x][neighbour.y] == 0) {
@@ -48,7 +44,9 @@ public:
                             char &n_i = island[neighbour.x][neighbour.y];
                             if(n_i == 0) {
                                 n_i = found_so_far;
+                                bfs.push_back({neighbour.x, neighbour.y, -1}); // don't care about distance
                             } else {
+                                // islands are separate
                                 assert(n_i == found_so_far);
                             }
                         }
@@ -76,7 +74,7 @@ public:
                 auto &n_i = island[neighbour.x][neighbour.y];
                 if(n_i == 2) {
                     // found shortest path
-                    int answer = node.dist + 1;
+                    int answer = node.dist;
                     return answer;
                 } else if(n_i == 0) {
                     n_i = 1;
