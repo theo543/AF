@@ -6,12 +6,13 @@ std::ofstream out("patrol2.out");
 
 int n, m, k;
 
-// lcm(1,2,3,4,5,6,7) = 420
-// first subtask: 420 * 100 ~= 500 * 100 = 50000 = 5 * 10^4
-// second subtask: 1 * 10000 = 10^4
-// third subtask: 2 * 10^4
-const int MAX_BOOLS = 5 * 10000;
+// memory = 64MB = 8 * 1_000_000 64 bit ints
 
+// lcm(1,2,3,4,5,6,7) = 420
+// third subtask: 420 * 10^4
+const int MAX_BOOLS = 5 * 1000000;
+
+// 5 * 1000000 packed bools ~= 100_000 ints = 50_000 64 bit ints
 std::vector<bool> is_occupied(MAX_BOOLS, false), is_visited(MAX_BOOLS, false);
 
 const int MAX_NODES = 10000;
@@ -29,26 +30,26 @@ int main() {
     for(int x = 0;x < n;x++) {
         edges[x].push_back(x);
     }
-    int num_repeats;
-    if(k == 0) {
-        // second subtask
-        num_repeats = 1;
-    } else if(n <= 100) {
-        // first or third
-        num_repeats = 420;
-    } else {
-        // definitely third subtask
-        num_repeats = 2;
-    }
+    const int num_repeats = 420;
+    //if(k == 0) {
+    //    // second subtask
+    //    num_repeats = 1;
+    //} else if(n <= 100) {
+    //    // first or third
+    //    num_repeats = 420;
+    //} else {
+    //    // definitely third subtask
+    //    num_repeats = 2;
+    //}
     std::vector<int> patrol(7);
     for(int x = 0, li;x < k;x++) {
         in >> li;
         for(int y = 0;y < li;y++) {
             in >> patrol[y];
         }
-        if((num_repeats == 2) && (li > 2)) {
-            __builtin_trap();
-        }
+        //if((num_repeats == 2) && (li > 2)) {
+        //    __builtin_trap();
+        //}
         for(int time = 0;time < num_repeats;time++) {
             int current_patrol = time % li;
             int occupied_node = patrol[current_patrol];
@@ -65,6 +66,10 @@ int main() {
     std::vector<bfs_info> bfs;
 
     bfs.reserve(num_repeats * n);
+
+    // 420 * 10000 ~= 500 * 10000 = 5 * 1000000
+    // most of our 64MB will go here
+
     bfs.push_back({1, 0, 0});
     is_visited[0] = true;
     for(std::size_t x = 0;x < bfs.size();x++) {
