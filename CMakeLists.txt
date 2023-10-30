@@ -27,3 +27,4 @@ add_custom_command(TARGET patrol2 POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/patrol2.in ${CMAKE_CURRENT_BINARY_DIR}/patrol2.in
 )
+add_executable(padure_optimized padure_optimized.cpp)
