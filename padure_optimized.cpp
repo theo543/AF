@@ -2,10 +2,9 @@
 #include <deque>
 #include <cstring>
 #include <climits>
-char types[1000][1000];
+int types[1000][1000];
 int dist[1000][1000];
 int main() {
-    memset(dist, CHAR_MAX, sizeof(dist));
     int n, m;
     int src_x, src_y, dst_x, dst_y;
     {
@@ -15,6 +14,7 @@ int main() {
         for(int x = 0; x < n; x++) {
             for(int y = 0; y < m; y++) {
                 in >> types[x][y];
+                dist[x][y] = 1000 * 1000 * 2;
             }
         }
     }
@@ -28,11 +28,6 @@ int main() {
     while(!bfs.empty()) {
         coord c = bfs.front();
         bfs.pop_front();
-        if(c.x == dst_x && c.y == dst_y) {
-            std::ofstream out("padure.out");
-            out << dist[c.x][c.y] << "\n";
-            return 0;
-        }
         constexpr coord dirs[] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
         for(const coord &d : dirs) {
             int x1 = c.x + d.x, y1 = c.y + d.y;
@@ -51,5 +46,7 @@ int main() {
         }
     }
 
-    __builtin_trap();
+    std::ofstream out("padure.out");
+    out << dist[dst_x][dst_y] << "\n";
+    return 0;
 }
