@@ -1,6 +1,6 @@
 #include <vector>
 #include <cassert>
-
+using std::size_t;
 class Solution {
 public:
     static int shortestBridge(const std::vector<std::vector<int>>& grid) {

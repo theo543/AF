@@ -1,6 +1,7 @@
 #include <fstream>
 #include <deque>
 #include <cstring>
+#include <climits>
 char types[1000][1000];
 int dist[1000][1000];
 int main() {
