@@ -40,3 +40,8 @@ add_custom_command(TARGET oracol POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/HW2/oracol.in ${CMAKE_CURRENT_BINARY_DIR}/oracol.in
 )
+add_executable(apm2 HW2/apm2.cpp)
+add_custom_command(TARGET apm2 POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/HW2/apm2.in ${CMAKE_CURRENT_BINARY_DIR}/apm2.in
+)
