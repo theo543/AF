@@ -45,3 +45,4 @@ add_custom_command(TARGET apm2 POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/HW2/apm2.in ${CMAKE_CURRENT_BINARY_DIR}/apm2.in
 )
+add_executable(apm2_optimized HW2/apm2_optimized.cpp)
