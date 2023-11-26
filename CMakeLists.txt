@@ -51,3 +51,8 @@ add_custom_command(TARGET dragoni POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/HW2/dragoni.in ${CMAKE_CURRENT_BINARY_DIR}/dragoni.in
 )
+add_executable(camionase HW2/camionase.cpp)
+add_custom_command(TARGET camionase POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/HW2/camionas.in ${CMAKE_CURRENT_BINARY_DIR}/camionase.in
+)
