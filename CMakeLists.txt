@@ -28,3 +28,4 @@ add_custom_command(TARGET patrol2 POST_BUILD
         ${CMAKE_CURRENT_SOURCE_DIR}/HW1/patrol2.in ${CMAKE_CURRENT_BINARY_DIR}/patrol2.in
 )
 add_executable(padure_optimized HW1/optimized/padure_optimized.cpp)
+add_executable(test_cheapest_flight_within_k_stops HW2/test_cheapest_flight_within_k_stops.cpp)

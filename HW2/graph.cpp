@@ -300,10 +300,6 @@ public:
             }
             for(auto e : nodes[top.node].out) {
                 assert(e.cost >= 0);
-                if(e.cost == UINT64_MAX) {
-                    // unreachable
-                    continue;
-                }
                 uint relaxed_distance = top.distance + e.cost;
                 if(relaxed_distance < distances[e.dst]) {
                     distances[e.dst] = relaxed_distance;
