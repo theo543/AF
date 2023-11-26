@@ -29,3 +29,4 @@ add_custom_command(TARGET patrol2 POST_BUILD
 )
 add_executable(padure_optimized HW1/optimized/padure_optimized.cpp)
 add_executable(test_cheapest_flight_within_k_stops HW2/test_cheapest_flight_within_k_stops.cpp)
+add_executable(test_checking_existence_limited_paths HW2/test_checking_existence_limited_paths.cpp)

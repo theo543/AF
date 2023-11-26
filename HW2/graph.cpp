@@ -29,8 +29,43 @@ struct djikstra_result {
     std::vector<uint> parents;
 };
 
+struct union_find {
+    std::vector<uint> parent;
+    std::vector<uint> size;
+    uint find(uint x) {
+        assert(x < parent.size());
+        uint answer = x;
+        while(parent[answer] != answer) {
+            answer = parent[answer];
+        }
+        uint second_pass = x;
+        while(parent[second_pass] != second_pass) {
+            uint next = parent[second_pass];
+            parent[second_pass] = answer;
+            second_pass = next;
+        }
+        return answer;
+    }
+    void merge(uint a, uint b) {
+        assert(a < parent.size());
+        assert(b < parent.size());
+        a = find(a);
+        b = find(b);
+        if(a == b) {
+            return;
+        }
+        if(size[a] < size[b]) {
+            std::swap(a, b);
+        }
+        parent[b] = a;
+        size[a] += size[b];
+    }
+};
+
 class graph {
     std::vector<node> nodes;
+    bool using_union_find = false;
+    union_find uf;
 public:
     graph() = default;
     uint nr_nodes() {
@@ -45,6 +80,9 @@ public:
         assert(dst < nr_nodes());
         nodes[dst].in.push_back({src, dst, cost});
         nodes[src].out.push_back({src, dst, cost});
+        if(using_union_find) {
+            uf.merge(src, dst);
+        }
         return {src, dst, static_cast<uint32_t>(nodes[dst].in.size() - 1), static_cast<uint32_t>(nodes[src].out.size() - 1)};
     }
     void set_cost(edge_indexes e, sint cost) {
@@ -309,5 +347,19 @@ public:
             }
         }
         return {distances, parents};
+    }
+    void init_union_find() {
+        uint sz = nr_nodes();
+        uf.size = std::vector<uint>(sz, 1);
+        uf.parent.resize(sz);
+        for(uint x = 0;x < sz;x++) {
+            uf.parent[x] = x;
+        }
+        using_union_find = true;
+    }
+    uint find(uint x) {
+        assert(x < nr_nodes());
+        assert(using_union_find);
+        return uf.find(x);
     }
 };
