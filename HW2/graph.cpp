@@ -4,12 +4,13 @@
 #include <queue>
 #include <stack>
 
-#define uint uint32_t
+#define uint uint64_t
+#define sint int64_t
 
 struct edge {
     uint src;
     uint dst;
-    uint cost;
+    sint cost;
 };
 
 struct edge_indexes {
@@ -23,6 +24,11 @@ struct node {
     std::vector<edge> in, out;
 };
 
+struct djikstra_result {
+    std::vector<uint> distances;
+    std::vector<uint> parents;
+};
+
 class graph {
     std::vector<node> nodes;
 public:
@@ -34,14 +40,14 @@ public:
         assert(nodes.size() <= size);
         nodes.resize(size);
     }
-    edge_indexes add_edge(uint src, uint dst, uint cost = 1) {
+    edge_indexes add_edge(uint src, uint dst, sint cost = 1) {
         assert(src < nr_nodes());
         assert(dst < nr_nodes());
         nodes[dst].in.push_back({src, dst, cost});
         nodes[src].out.push_back({src, dst, cost});
         return {src, dst, static_cast<uint32_t>(nodes[dst].in.size() - 1), static_cast<uint32_t>(nodes[src].out.size() - 1)};
     }
-    void set_cost(edge_indexes e, uint cost) {
+    void set_cost(edge_indexes e, sint cost) {
         assert(e.src < nr_nodes());
         assert(e.dst < nr_nodes());
         assert(e.in_index < nodes[e.dst].in.size());
@@ -173,10 +179,10 @@ public:
 
     std::vector<uint> components() {
         uint sz = nr_nodes();
-        std::vector<uint> comp(sz, UINT32_MAX);
+        std::vector<uint> comp(sz, UINT64_MAX);
         uint next_comp = 0;
         for(uint x = 0;x < sz;x++) {
-            if(comp[x] == UINT32_MAX) {
+            if(comp[x] == UINT64_MAX) {
                 auto bfs_result = bfs_distances({x});
                 for(auto r : bfs_result) {
                     comp[r.node] = next_comp;
@@ -185,7 +191,7 @@ public:
             next_comp++;
         }
         for(uint x = 0;x < sz;x++) {
-            assert(comp[x] != UINT32_MAX);
+            assert(comp[x] != UINT64_MAX);
         }
         return comp;
     }
@@ -195,12 +201,12 @@ public:
         uint close; // node with lowest open time that we can reach from this node
     };
 
-    // DFS to find open and close times for each node, UINT32_MAX if unreachable, single source
+    // DFS to find open and close times for each node, UINT64_MAX if unreachable, single source
     std::vector<node_w_dfs_result> dfs_open_close(uint root) {
         uint sz = nr_nodes();
         assert(root < sz);
 
-        std::vector<node_w_dfs_result> result(sz, {UINT32_MAX, UINT32_MAX});
+        std::vector<node_w_dfs_result> result(sz, {UINT64_MAX, UINT64_MAX});
         const auto open = [&](uint x) -> uint& {
             return result[x].open;
         };
@@ -218,13 +224,13 @@ public:
         uint next_open = 0;
 
         const auto call = [&](uint node, uint parent) {
-            assert(open(node) == UINT32_MAX);
-            assert(close(node) == UINT32_MAX);
+            assert(open(node) == UINT64_MAX);
+            assert(close(node) == UINT64_MAX);
             open(node) = close(node) = next_open++;
             call_stack.push({node, parent, 0});
         };
 
-        call(root, UINT32_MAX);
+        call(root, UINT64_MAX);
 
         while(!call_stack.empty()) {
             uint node = call_stack.top().node;
@@ -247,7 +253,7 @@ public:
 
             if(child == call_stack.top().parent) {
                 continue; // continue to next iteration
-            } else if(open(child) == UINT32_MAX) {
+            } else if(open(child) == UINT64_MAX) {
                 call(child, node);
                 continue; // recurse
             } else {
@@ -257,5 +263,55 @@ public:
         }
 
         return result;
+    }
+
+    djikstra_result dijkstra(uint root) {
+        uint sz = nr_nodes();
+        assert(root < sz);
+
+        std::vector<uint> distances(sz, UINT64_MAX);
+        std::vector<uint> parents(sz, UINT64_MAX);
+        std::vector<bool> visited(sz, false);
+
+        struct lazy_dji_node {
+            uint node;
+            uint distance;
+
+            bool operator<(const lazy_dji_node &other) const {
+                // priority queue is a max heap, so we want to return true if this distance is smaller
+                return distance > other.distance;
+            }
+        };
+
+        std::priority_queue<lazy_dji_node> pq;
+        distances[root] = 0;
+        parents[root] = root;
+        pq.push({root, 0});
+
+        while(!pq.empty()) {
+            auto top = pq.top();
+            // once a node is visited never look at it again (assume no negative edges)
+            visited[top.node] = true;
+            pq.pop();
+            if(top.distance != distances[top.node]) {
+                // we've already found a shorter path to this node
+                // lazy djikstra does not use a decrease-key operation, so ignore instead
+                continue;
+            }
+            for(auto e : nodes[top.node].out) {
+                assert(e.cost >= 0);
+                if(e.cost == UINT64_MAX) {
+                    // unreachable
+                    continue;
+                }
+                uint relaxed_distance = top.distance + e.cost;
+                if(relaxed_distance < distances[e.dst]) {
+                    distances[e.dst] = relaxed_distance;
+                    parents[e.dst] = top.node;
+                    pq.push({e.dst, relaxed_distance});
+                }
+            }
+        }
+        return {distances, parents};
     }
 };
