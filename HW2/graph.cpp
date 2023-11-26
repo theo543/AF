@@ -3,6 +3,7 @@
 #include <cassert>
 #include <queue>
 #include <stack>
+#include <algorithm>
 
 #define uint uint64_t
 #define sint int64_t
@@ -348,6 +349,7 @@ public:
         }
         return {distances, parents};
     }
+
     void init_union_find() {
         uint sz = nr_nodes();
         uf.size = std::vector<uint>(sz, 1);
@@ -357,14 +359,38 @@ public:
         }
         using_union_find = true;
     }
+
     uint find(uint x) {
         assert(x < nr_nodes());
         assert(using_union_find);
         return uf.find(x);
     }
+
     uint find_size(uint x) {
         assert(x < nr_nodes());
         assert(using_union_find);
         return uf.size[uf.find(x)];
+    }
+
+    std::vector<edge> mst() {
+        union_find mst_uf{std::vector<uint>(nr_nodes()), std::vector<uint>(nr_nodes(), 1)};
+        for(uint x = 0;x < nr_nodes();x++) {
+            mst_uf.parent[x] = x;
+        }
+        std::vector<edge> edges;
+        for(uint x = 0;x < nr_nodes();x++) {
+            edges.insert(edges.end(), nodes[x].out.begin(), nodes[x].out.end());
+        }
+        std::sort(edges.begin(), edges.end(), [](const edge &a, const edge &b) {
+            return a.cost < b.cost;
+        });
+        std::vector<edge> mst;
+        for(const auto &e : edges) {
+            if(mst_uf.find(e.src) != mst_uf.find(e.dst)) {
+                mst_uf.merge(e.src, e.dst);
+                mst.push_back(e);
+            }
+        }
+        return mst;
     }
 };

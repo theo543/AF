@@ -35,3 +35,8 @@ add_custom_command(TARGET bile POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/HW2/bile.in ${CMAKE_CURRENT_BINARY_DIR}/bile.in
 )
+add_executable(oracol HW2/oracol.cpp)
+add_custom_command(TARGET oracol POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/HW2/oracol.in ${CMAKE_CURRENT_BINARY_DIR}/oracol.in
+)
