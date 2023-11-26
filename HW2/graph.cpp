@@ -9,6 +9,14 @@
 struct edge {
     uint src;
     uint dst;
+    uint cost;
+};
+
+struct edge_indexes {
+    uint src;
+    uint dst;
+    uint in_index;
+    uint out_index;
 };
 
 struct node {
@@ -26,11 +34,20 @@ public:
         assert(nodes.size() <= size);
         nodes.resize(size);
     }
-    void add_edge(uint src, uint dst) {
+    edge_indexes add_edge(uint src, uint dst, uint cost = 1) {
         assert(src < nr_nodes());
         assert(dst < nr_nodes());
-        nodes[dst].in.push_back({src, dst});
-        nodes[src].out.push_back({src, dst});
+        nodes[dst].in.push_back({src, dst, cost});
+        nodes[src].out.push_back({src, dst, cost});
+        return {src, dst, static_cast<uint32_t>(nodes[dst].in.size() - 1), static_cast<uint32_t>(nodes[src].out.size() - 1)};
+    }
+    void set_cost(edge_indexes e, uint cost) {
+        assert(e.src < nr_nodes());
+        assert(e.dst < nr_nodes());
+        assert(e.in_index < nodes[e.dst].in.size());
+        assert(e.out_index < nodes[e.src].out.size());
+        nodes[e.dst].in[e.in_index].cost = cost;
+        nodes[e.src].out[e.out_index].cost = cost;
     }
 
     // Topologically sort the nodes so that any edge A->B means "A comes before B".
