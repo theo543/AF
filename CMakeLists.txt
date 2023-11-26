@@ -56,3 +56,8 @@ add_custom_command(TARGET camionase POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/HW2/camionas.in ${CMAKE_CURRENT_BINARY_DIR}/camionase.in
 )
+add_executable(trilant HW2/trilant.cpp)
+add_custom_command(TARGET trilant POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/HW2/trilant.in ${CMAKE_CURRENT_BINARY_DIR}/trilant.in
+)

@@ -28,6 +28,20 @@ struct node {
 struct djikstra_result {
     std::vector<uint> distances;
     std::vector<uint> parents;
+
+    std::vector<uint> reconstruct_path(uint node, bool fix_order = true) const {
+        assert(node < distances.size());
+        std::vector<uint> path;
+        while(node != parents[node]) {
+            path.push_back(node);
+            node = parents[node];
+        }
+        path.push_back(node);
+        if(fix_order) {
+            std::reverse(path.begin(), path.end());
+        }
+        return path;
+    }
 };
 
 struct union_find {
