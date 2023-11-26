@@ -362,4 +362,9 @@ public:
         assert(using_union_find);
         return uf.find(x);
     }
+    uint find_size(uint x) {
+        assert(x < nr_nodes());
+        assert(using_union_find);
+        return uf.size[uf.find(x)];
+    }
 };
