@@ -62,3 +62,8 @@ add_custom_command(TARGET trilant POST_BUILD
         ${CMAKE_CURRENT_SOURCE_DIR}/HW2/trilant.in ${CMAKE_CURRENT_BINARY_DIR}/trilant.in
 )
 add_executable(test_find_critical_pseudo_critical HW2/test_find_critical_pseudo_critical.cpp)
+add_executable(cablaj HW2/cablaj.cpp)
+add_custom_command(TARGET cablaj POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/HW2/cablaj.in ${CMAKE_CURRENT_BINARY_DIR}/cablaj.in
+)
