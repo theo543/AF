@@ -61,3 +61,4 @@ add_custom_command(TARGET trilant POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/HW2/trilant.in ${CMAKE_CURRENT_BINARY_DIR}/trilant.in
 )
+add_executable(test_find_critical_pseudo_critical HW2/test_find_critical_pseudo_critical.cpp)

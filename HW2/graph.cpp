@@ -4,6 +4,7 @@
 #include <queue>
 #include <stack>
 #include <algorithm>
+#include <numeric>
 
 #define uint uint64_t
 #define sint int64_t
@@ -77,6 +78,12 @@ struct union_find {
     }
 };
 
+uint get_mst_cost(const std::vector<edge> &edges) {
+    return std::accumulate(edges.begin(), edges.end(), 0, [](const auto &acc, const auto &e) {
+        return acc + e.cost;
+    });
+}
+
 class graph {
     std::vector<node> nodes;
     bool using_union_find = false;
@@ -107,6 +114,14 @@ public:
         assert(e.out_index < nodes[e.src].out.size());
         nodes[e.dst].in[e.in_index].cost = cost;
         nodes[e.src].out[e.out_index].cost = cost;
+    }
+    uint get_cost(edge_indexes e) {
+        assert(e.src < nr_nodes());
+        assert(e.dst < nr_nodes());
+        assert(e.in_index < nodes[e.dst].in.size());
+        assert(e.out_index < nodes[e.src].out.size());
+        assert(nodes[e.dst].in[e.in_index].cost == nodes[e.src].out[e.out_index].cost);
+        return nodes[e.dst].in[e.in_index].cost;
     }
 
     // Topologically sort the nodes so that any edge A->B means "A comes before B".
