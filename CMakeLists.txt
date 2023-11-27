@@ -68,3 +68,4 @@ add_custom_command(TARGET cablaj POST_BUILD
         ${CMAKE_CURRENT_SOURCE_DIR}/HW2/cablaj.in ${CMAKE_CURRENT_BINARY_DIR}/cablaj.in
 )
 add_executable(camionas_optimized HW2/camionas_optimized.cpp)
+add_executable(dragoni_optimized HW2/dragoni_optimized.cpp)
