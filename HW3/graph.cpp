@@ -422,4 +422,110 @@ public:
         }
         return mst;
     }
+
+    struct flow_edge {
+        uint src;
+        uint dst;
+        sint flow;
+        sint capacity;
+    };
+
+    struct flow_result {
+        uint total;
+        std::vector<std::vector<flow_edge>> edges;
+    };
+
+    flow_result edmonds_karp(uint src, uint dst) {
+        flow_result flow{0, {}};
+
+        std::vector<std::vector<flow_edge*>> back_edges;
+
+        flow.edges.resize(nodes.size());
+        back_edges.resize(nodes.size());
+        for(uint x = 0;x<nodes.size();x++) {
+            flow.edges[x].resize(nodes[x].out.size());
+            for(uint y = 0;y<nodes[x].out.size();y++) {
+                auto &edge = nodes[x].out[y];
+                flow.edges[x][y] = flow_edge{edge.src, edge.dst, 0, edge.cost};
+                back_edges[y].push_back(&flow.edges[x][y]);
+            }
+        }
+
+        struct flow_bfs_step {
+            uint node;
+            uint prev_step;
+            flow_edge *via;
+            bool is_back_edge;
+        };
+
+        std::vector<flow_bfs_step> bfs;
+        std::vector<char> visited(flow.edges.size());
+
+        // loop until BFS fails
+        for(;;) {
+            bool path_found = false;
+            // try to find a path
+            bfs.clear();
+            std::fill(visited.begin(), visited.end(), false);
+            bfs.push_back({src, 0, nullptr, false});
+            for(uint i = 0;i<bfs.size();i++) {
+                uint node = bfs[i].node;
+                // check forward edges
+                auto &out_edges = flow.edges[node];
+                for(flow_edge &edge : out_edges) {
+                    if(edge.flow == edge.capacity || visited[edge.dst]) {
+                        continue;
+                    }
+                    visited[edge.dst] = true;
+                    bfs.push_back({edge.dst, i, &edge, false});
+                }
+                // check backward edges
+                const auto &in_edges = back_edges[node];
+                for(uint j = 0;j<in_edges.size();j++) {
+                    flow_edge &edge = *in_edges[j];
+                    if(edge.flow == 0 || visited[edge.src]) {
+                        continue;
+                    }
+                    visited[edge.src] = true;
+                    bfs.push_back({edge.src, i, &edge, true});
+                }
+                // check if we found a path
+                if(bfs.back().node == dst) {
+                    path_found = true;
+                    break;
+                }
+            }
+            if(!path_found) {
+                break;
+            }
+            // trace path, perform updates
+            sint flow_increase = INT64_MAX;
+            for(uint last_step = bfs.size() - 1;last_step != 0;last_step = bfs[last_step].prev_step) {
+                const auto &edge = *bfs[last_step].via;
+                if(bfs[last_step].is_back_edge) {
+                    flow_increase = std::min(flow_increase, edge.flow);
+                } else {
+                    flow_increase = std::min(flow_increase, edge.capacity - edge.flow);
+                }
+            }
+            assert(flow_increase > 0);
+            for(uint last_step = bfs.size() - 1;last_step != 0;last_step = bfs[last_step].prev_step) {
+                auto &edge = *bfs[last_step].via;
+                if(bfs[last_step].is_back_edge) {
+                    assert(flow_increase <= edge.flow);
+                    edge.flow -= flow_increase;
+                } else {
+                    assert(flow_increase <= (edge.capacity - edge.flow));
+                    edge.flow += flow_increase;
+                }
+            }
+        }
+
+        // calculate total flow
+        for(const auto &edge : flow.edges[src]) {
+            flow.total += edge.flow;
+        }
+
+        return flow;
+    }
 };
