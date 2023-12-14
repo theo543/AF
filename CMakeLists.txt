@@ -2,9 +2,16 @@ cmake_minimum_required(VERSION 3.20)
 project(AF_HW)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic -g")
-if(!WIN32)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -g")
+
+include(CheckCXXSourceCompiles)
+set(CMAKE_REQUIRED_FLAGS "-fsanitize=address,undefined")
+check_cxx_source_compiles("#include <iostream>\nint main() { int arr[3] = {1, 2, 3}; int index; std::cin >> index; std::cout << arr[index]; return 0; }" SANITIZERS_SUPPORTED)
+if(SANITIZERS_SUPPORTED)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined")
+    message(STATUS "Sanitizers enabled")
+    add_compile_options(-fsanitize=address,undefined)
+    add_link_options(-fsanitize=address,undefined)
 endif()
 
 add_executable(test_bipart HW1/test_bipart.cpp)
