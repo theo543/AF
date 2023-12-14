@@ -128,7 +128,7 @@ public:
     // Any impossible nodes will not appear in the result.
     std::vector<uint> topsort() {
         uint sz = nr_nodes();
-    
+
         // Remaining dependencies for each node.
         std::vector<uint> remaining(sz);
 
@@ -447,7 +447,7 @@ public:
             for(uint y = 0;y<nodes[x].out.size();y++) {
                 auto &edge = nodes[x].out[y];
                 flow.edges[x][y] = flow_edge{edge.src, edge.dst, 0, edge.cost};
-                back_edges[y].push_back(&flow.edges[x][y]);
+                back_edges[edge.dst].push_back(&flow.edges[x][y]);
             }
         }
 
