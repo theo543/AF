@@ -463,7 +463,6 @@ public:
 
         // loop until BFS fails
         for(;;) {
-            bool path_found = false;
             // try to find a path
             bfs.clear();
             std::fill(visited.begin(), visited.end(), false);
@@ -478,6 +477,10 @@ public:
                     }
                     visited[edge.dst] = true;
                     bfs.push_back({edge.dst, i, &edge, false});
+                    // check if we found a path
+                    if(bfs.back().node == dst) {
+                        goto break_outer__path_found;
+                    }
                 }
                 // check backward edges
                 const auto &in_edges = back_edges[node];
@@ -488,16 +491,14 @@ public:
                     }
                     visited[edge.src] = true;
                     bfs.push_back({edge.src, i, &edge, true});
-                }
-                // check if we found a path
-                if(bfs.back().node == dst) {
-                    path_found = true;
-                    break;
+                    // check if we found a path
+                    if(bfs.back().node == dst) {
+                        goto break_outer__path_found;
+                    }
                 }
             }
-            if(!path_found) {
-                break;
-            }
+            break;
+            break_outer__path_found:
             // trace path, perform updates
             sint flow_increase = INT64_MAX;
             for(uint last_step = bfs.size() - 1;last_step != 0;last_step = bfs[last_step].prev_step) {
