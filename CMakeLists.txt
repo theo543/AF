@@ -76,3 +76,8 @@ add_custom_command(TARGET cablaj POST_BUILD
 )
 add_executable(camionas_optimized HW2/camionas_optimized.cpp)
 add_executable(dragoni_optimized HW2/dragoni_optimized.cpp)
+add_executable(ghizi HW3/ghizi.cpp)
+add_custom_command(TARGET ghizi POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/HW3/ghizi.in ${CMAKE_CURRENT_BINARY_DIR}/ghizi.in
+)
