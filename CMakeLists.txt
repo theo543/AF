@@ -81,3 +81,8 @@ add_custom_command(TARGET ghizi POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/HW3/ghizi.in ${CMAKE_CURRENT_BINARY_DIR}/ghizi.in
 )
+add_executable(harta HW3/harta.cpp)
+add_custom_command(TARGET harta POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/HW3/harta.in ${CMAKE_CURRENT_BINARY_DIR}/harta.in
+)

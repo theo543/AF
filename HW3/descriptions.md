@@ -3,7 +3,7 @@
 At least 2 from each, at least 10 in total.
 
 ## Fluxuri
-* [harta](https://www.infoarena.ro/problema/harta)
+* [harta](https://www.infoarena.ro/problema/harta) ✅
 * [546E](https://codeforces.com/problemset/problem/546/E)
 * [negot](https://infoarena.ro/problema/negot)
 * [ghizi](https://infoarena.ro/problema/ghizi) ✅
