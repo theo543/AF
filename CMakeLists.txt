@@ -87,3 +87,8 @@ add_custom_command(TARGET harta POST_BUILD
         ${CMAKE_CURRENT_SOURCE_DIR}/HW3/harta.in ${CMAKE_CURRENT_BINARY_DIR}/harta.in
 )
 add_executable(546E HW3/546E.cpp)
+add_executable(negot HW3/negot.cpp)
+add_custom_command(TARGET negot POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/HW3/negot.in ${CMAKE_CURRENT_BINARY_DIR}/negot.in
+)
