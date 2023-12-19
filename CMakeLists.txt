@@ -86,3 +86,4 @@ add_custom_command(TARGET harta POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/HW3/harta.in ${CMAKE_CURRENT_BINARY_DIR}/harta.in
 )
+add_executable(546E HW3/546E.cpp)
