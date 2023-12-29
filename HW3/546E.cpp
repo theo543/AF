@@ -47,7 +47,7 @@ int main() {
         std::cout << "NO\n";
         return 0;
     }
-    std::vector<std::vector<uint>> output = std::vector<std::vector<uint>>(n, std::vector<uint>(n, 0));
+    auto output = std::vector<std::vector<uint>>(n, std::vector<uint>(n, 0));
     for(const auto &node : flow.edges) {
         for(const auto &edge : node) {
             if(edge.flow != 0 && edge.src != source && edge.dst != sink) {

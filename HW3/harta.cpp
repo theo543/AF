@@ -12,10 +12,9 @@ const int FLOW_SINK = MAX_NODES * 2 + 1;
  * 201 | flow sink
  */
 
-std::ifstream in("harta.in");
-std::ofstream out("harta.out");
-
 int main() {
+    std::ifstream in("harta.in");
+    std::ofstream out("harta.out");
 
     graph g;
     g.grow(MAX_NODES * 2 + 2);

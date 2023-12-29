@@ -7,7 +7,7 @@
 #include <numeric>
 
 #define uint uint64_t
-#define sint int64_t
+#define sint  int64_t
 
 struct edge {
     uint src;
@@ -90,7 +90,7 @@ class graph {
     union_find uf;
 public:
     graph() = default;
-    uint nr_nodes() {
+    uint nr_nodes() const {
         return nodes.size();
     }
     void grow(uint size) {
@@ -107,7 +107,7 @@ public:
         }
         return {src, dst, static_cast<uint32_t>(nodes[dst].in.size() - 1), static_cast<uint32_t>(nodes[src].out.size() - 1)};
     }
-    void set_cost(edge_indexes e, sint cost) {
+    void set_cost(const edge_indexes &e, sint cost) {
         assert(e.src < nr_nodes());
         assert(e.dst < nr_nodes());
         assert(e.in_index < nodes[e.dst].in.size());
@@ -115,7 +115,7 @@ public:
         nodes[e.dst].in[e.in_index].cost = cost;
         nodes[e.src].out[e.out_index].cost = cost;
     }
-    uint get_cost(edge_indexes e) {
+    uint get_cost(const edge_indexes &e) {
         assert(e.src < nr_nodes());
         assert(e.dst < nr_nodes());
         assert(e.in_index < nodes[e.dst].in.size());
@@ -195,7 +195,7 @@ public:
                 // so that this works with undirected graphs, check neighbors of next_node since it may be connected
                 // to a colored node
                 col_vec[next_node] = A;
-                for(auto e : nodes[next_node].out) {
+                for(const auto &e : nodes[next_node].out) {
                     if(col_vec[e.dst] == A) {
                         col_vec[e.dst] = B;
                         break;
@@ -207,7 +207,7 @@ public:
             uint node = color_from.front();
             assert(col_vec[node] != blank);
             color_from.pop();
-            for(auto e : nodes[node].out) {
+            for(const auto &e : nodes[node].out) {
                 if(col_vec[e.dst] == blank) {
                     col_vec[e.dst] = (col_vec[node] == A ? B : A);
                     colored++;
@@ -235,7 +235,7 @@ public:
             visited[x] = true;
         }
         for(uint x = 0;x < bfs.size();x++) {
-            for(auto e : nodes[bfs[x].node].out) {
+            for(const auto &e : nodes[bfs[x].node].out) {
                 if(!visited[e.dst]) {
                     visited[e.dst] = true;
                     bfs.push_back({e.dst, bfs[x].distance + 1});
@@ -366,7 +366,7 @@ public:
                 // lazy djikstra does not use a decrease-key operation, so ignore instead
                 continue;
             }
-            for(auto e : nodes[top.node].out) {
+            for(const auto &e : nodes[top.node].out) {
                 assert(e.cost >= 0);
                 uint relaxed_distance = top.distance + e.cost;
                 if(relaxed_distance < distances[e.dst]) {
@@ -445,7 +445,7 @@ public:
         for(uint x = 0;x<nodes.size();x++) {
             flow.edges[x].resize(nodes[x].out.size());
             for(uint y = 0;y<nodes[x].out.size();y++) {
-                auto &edge = nodes[x].out[y];
+                const auto &edge = nodes[x].out[y];
                 flow.edges[x][y] = flow_edge{edge.src, edge.dst, 0, edge.cost};
                 back_edges[edge.dst].push_back(&flow.edges[x][y]);
             }
