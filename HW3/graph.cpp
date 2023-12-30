@@ -544,19 +544,19 @@ bipartite_info solve_bipartite(const std::vector<uint> &left, const std::vector<
         g.add_edge(nodes, l, 1);
     }
     for(uint r : right) {
-        g.add_edge(r, nodes, 1);
+        g.add_edge(r, nodes + 1, 1);
     }
     for(const auto &edge : edges) {
-        g.add_edge(nodes, edge.first, 1);
+        g.add_edge(edge.first, edge.second, 1);
     }
     const auto flow = g.edmonds_karp(nodes, nodes + 1);
     bipartite_info result;
     std::vector<char> is_matched(left.size(), false);
     for(const auto &node : flow.edges) {
         for(const auto &edge : node) {
-            if(edge.src != nodes && edge.dst != nodes + 1) {
+            if(edge.src != nodes && edge.dst != nodes + 1 && edge.flow == 1) {
                 result.maximum_matching.push_back({edge.src, edge.dst});
-                is_matched[edge.src] = true;
+                is_matched.at(edge.src) = true;
             }
         }
     }
@@ -569,27 +569,23 @@ bipartite_info solve_bipartite(const std::vector<uint> &left, const std::vector<
                 unmatched_left_nodes.push_back(node);
             }
         }
-        for(const auto &edge : edges) {
+        for(const auto &edge : result.maximum_matching) {
             g.add_edge(edge.second, edge.first);
         }
         const auto &bfs = g.bfs_distances(unmatched_left_nodes);
-        std::vector<char> is_left(nodes, false);
+        std::vector<char> in_answer(nodes, false);
         for(uint node : left) {
-            is_left[node] = true;
+            in_answer[node] = true;
         }
         for(const auto &node_ : bfs) {
             uint node = node_.node;
             if(node >= nodes) {
                 continue;
             }
-            if(is_left[node] == false) {
-                result.minimum_vertex_cover.push_back(node);
-            } else {
-                is_left[node] = false;
-            }
+            in_answer[node] = !in_answer[node];
         }
         for(uint i = 0;i < nodes;i++) {
-            if(is_left[i]) {
+            if(in_answer[i]) {
                 result.minimum_vertex_cover.push_back(i);
             }
         }
