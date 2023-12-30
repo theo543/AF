@@ -589,6 +589,7 @@ bipartite_info solve_bipartite(const std::vector<uint> &left, const std::vector<
                 result.minimum_vertex_cover.push_back(i);
             }
         }
+        assert(result.maximum_matching.size() == result.minimum_vertex_cover.size());
     }
     return result;
 }

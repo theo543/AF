@@ -97,3 +97,8 @@ add_custom_command(TARGET paznici POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/HW3/paznici.in ${CMAKE_CURRENT_BINARY_DIR}/paznici.in
 )
+add_executable(senat HW3/senat.cpp)
+add_custom_command(TARGET senat POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/HW3/senat.in ${CMAKE_CURRENT_BINARY_DIR}/senat.in
+)
