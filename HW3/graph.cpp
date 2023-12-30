@@ -530,3 +530,65 @@ public:
         return flow;
     }
 };
+
+struct bipartite_info {
+    std::vector<std::pair<uint, uint>> maximum_matching;
+    std::vector<uint> minimum_vertex_cover;
+};
+
+bipartite_info solve_bipartite(const std::vector<uint> &left, const std::vector<uint> &right, const std::vector<std::pair<uint, uint>> &edges, bool include_min_vertex_cover) {
+    graph g;
+    const auto nodes = left.size() + right.size();
+    g.grow(nodes + 2);
+    for(const auto &edge : edges) {
+        g.add_edge(edge.first, edge.second, nodes * 2);
+        g.add_edge(nodes, edge.first, 1);
+        g.add_edge(edge.second, nodes + 1, 1);
+    }
+    const auto flow = g.edmonds_karp(nodes, nodes + 1);
+    bipartite_info result;
+    std::vector<char> is_matched(left.size(), false);
+    for(const auto &node : flow.edges) {
+        for(const auto &edge : node) {
+            if(edge.src != nodes && edge.dst != nodes + 1) {
+                result.maximum_matching.push_back({edge.src, edge.dst});
+                is_matched[edge.src] = true;
+            }
+        }
+    }
+    if(include_min_vertex_cover) {
+        // Kőnig's theorem
+        // https://math.stackexchange.com/a/3044297
+        std::vector<uint> unmatched_left_nodes;
+        for(uint node : left) {
+            if(!is_matched[node]) {
+                unmatched_left_nodes.push_back(node);
+            }
+        }
+        for(const auto &edge : edges) {
+            g.add_edge(edge.second, edge.first);
+        }
+        const auto &bfs = g.bfs_distances(unmatched_left_nodes);
+        std::vector<char> is_left(nodes, false);
+        for(uint node : left) {
+            is_left[node] = true;
+        }
+        for(const auto &node_ : bfs) {
+            uint node = node_.node;
+            if(node >= nodes) {
+                continue;
+            }
+            if(is_left[node] == false) {
+                result.minimum_vertex_cover.push_back(node);
+            } else {
+                is_left[node] = false;
+            }
+        }
+        for(uint i = 0;i < nodes;i++) {
+            if(is_left[i]) {
+                result.minimum_vertex_cover.push_back(i);
+            }
+        }
+    }
+    return result;
+}
