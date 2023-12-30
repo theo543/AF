@@ -102,3 +102,4 @@ add_custom_command(TARGET senat POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/HW3/senat.in ${CMAKE_CURRENT_BINARY_DIR}/senat.in
 )
+add_executable(no_prime_sum HW3/no_prime_sum.cpp)

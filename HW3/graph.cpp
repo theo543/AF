@@ -551,12 +551,12 @@ bipartite_info solve_bipartite(const std::vector<uint> &left, const std::vector<
     }
     const auto flow = g.edmonds_karp(nodes, nodes + 1);
     bipartite_info result;
-    std::vector<char> is_matched(left.size(), false);
+    std::vector<char> left_is_matched(nodes, false);
     for(const auto &node : flow.edges) {
         for(const auto &edge : node) {
             if(edge.src != nodes && edge.dst != nodes + 1 && edge.flow == 1) {
                 result.maximum_matching.push_back({edge.src, edge.dst});
-                is_matched.at(edge.src) = true;
+                left_is_matched.at(edge.src) = true;
             }
         }
     }
@@ -565,7 +565,7 @@ bipartite_info solve_bipartite(const std::vector<uint> &left, const std::vector<
         // https://math.stackexchange.com/a/3044297
         std::vector<uint> unmatched_left_nodes;
         for(uint node : left) {
-            if(!is_matched[node]) {
+            if(!left_is_matched[node]) {
                 unmatched_left_nodes.push_back(node);
             }
         }

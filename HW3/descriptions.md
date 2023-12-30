@@ -14,7 +14,7 @@ At least 2 from each, at least 10 in total.
 
 * [senat](https://www.infoarena.ro/problema/senat) ✅
 * [paznici](https://www.infoarena.ro/problema/paznici)
-* [no-prime-sum](https://csacademy.com/contest/archive/task/no-prime-sum/)
+* [no-prime-sum](https://csacademy.com/contest/archive/task/no-prime-sum/) ✅
 
 ## Eulerian
 
