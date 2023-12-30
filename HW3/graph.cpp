@@ -540,10 +540,14 @@ bipartite_info solve_bipartite(const std::vector<uint> &left, const std::vector<
     graph g;
     const auto nodes = left.size() + right.size();
     g.grow(nodes + 2);
+    for(uint l : left) {
+        g.add_edge(nodes, l, 1);
+    }
+    for(uint r : right) {
+        g.add_edge(r, nodes, 1);
+    }
     for(const auto &edge : edges) {
-        g.add_edge(edge.first, edge.second, nodes * 2);
         g.add_edge(nodes, edge.first, 1);
-        g.add_edge(edge.second, nodes + 1, 1);
     }
     const auto flow = g.edmonds_karp(nodes, nodes + 1);
     bipartite_info result;

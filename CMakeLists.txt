@@ -92,3 +92,8 @@ add_custom_command(TARGET negot POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/HW3/negot.in ${CMAKE_CURRENT_BINARY_DIR}/negot.in
 )
+add_executable(paznici HW3/paznici.cpp)
+add_custom_command(TARGET paznici POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/HW3/paznici.in ${CMAKE_CURRENT_BINARY_DIR}/paznici.in
+)
