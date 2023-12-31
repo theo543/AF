@@ -103,3 +103,4 @@ add_custom_command(TARGET senat POST_BUILD
         ${CMAKE_CURRENT_SOURCE_DIR}/HW3/senat.in ${CMAKE_CURRENT_BINARY_DIR}/senat.in
 )
 add_executable(no_prime_sum HW3/no_prime_sum.cpp)
+add_executable(test_shortest_path_all_nodes HW3/test_shortest_path_all_nodes.cpp)
