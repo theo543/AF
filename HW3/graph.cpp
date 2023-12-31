@@ -529,6 +529,46 @@ public:
 
         return flow;
     }
+
+    std::pair<uint, std::vector<uint>> traveling_salesman(bool cycle) {
+        const uint size = nodes.size();
+        std::vector<uint> matrix(size * size, UINT64_MAX);
+        const auto at = [&matrix, size](uint a, uint b) -> uint& {
+            return matrix[a * size + b];
+        };
+        for(const auto &node : nodes) {
+            for(const auto &edge : node.out) {
+                at(edge.src, edge.dst) = edge.cost;
+            }
+        }
+        std::pair<uint, std::vector<uint>> answer{UINT64_MAX, {}};
+        std::vector<uint> search(size);
+        std::iota(search.begin(), search.end(), 0);
+        do {
+            uint cost = 0;
+            bool valid = true;
+            const auto add_cost = [&cost, &valid, &answer](uint next_cost) {
+                uint prev_cost = cost;
+                cost += next_cost;
+                if(cost < prev_cost) {
+                    valid = false;
+                }
+                if(cost > answer.first) {
+                    valid = false;
+                }
+            };
+            for(uint x = 0;valid && x < (size - 1); x++) {
+                add_cost(at(search[x], search[x + 1]));
+            }
+            if(cycle) {
+                add_cost(at(search[size - 1], search[0]));
+            }
+            if(valid && cost < answer.first) {
+                answer = {cost, search};
+            }
+        } while(std::next_permutation(search.begin(), search.end()));
+        return answer;
+    }
 };
 
 struct bipartite_info {
