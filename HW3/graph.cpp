@@ -9,6 +9,12 @@
 #define uint uint64_t
 #define sint  int64_t
 
+#if __cplusplus >= 202002L
+#define POPCOUNT std::popcount
+#else
+#define POPCOUNT __builtin_popcount
+#endif
+
 struct edge {
     uint src;
     uint dst;
@@ -530,43 +536,97 @@ public:
         return flow;
     }
 
-    std::pair<uint, std::vector<uint>> traveling_salesman(bool cycle) {
+    std::pair<uint, std::vector<uint>> traveling_salesman() {
         const uint size = nodes.size();
         std::vector<uint> matrix(size * size, UINT64_MAX);
-        const auto at = [&matrix, size](uint a, uint b) -> uint& {
+        const auto m_at = [&matrix, size](uint a, uint b) -> uint& {
             return matrix[a * size + b];
         };
+        uint upper_bound = 0;
         for(const auto &node : nodes) {
             for(const auto &edge : node.out) {
-                at(edge.src, edge.dst) = edge.cost;
+                upper_bound += edge.cost;
+                m_at(edge.src, edge.dst) = edge.cost;
             }
         }
-        std::pair<uint, std::vector<uint>> answer{UINT64_MAX, {}};
-        std::vector<uint> search(size);
-        std::iota(search.begin(), search.end(), 0);
-        do {
-            uint cost = 0;
-            bool valid = true;
-            const auto add_cost = [&cost, &valid, &answer](uint next_cost) {
-                uint prev_cost = cost;
-                cost += next_cost;
-                if(cost < prev_cost) {
-                    valid = false;
+        upper_bound *= 10;
+        std::replace_if(matrix.begin(), matrix.end(), [](uint val) -> bool {return val == UINT64_MAX;}, upper_bound);
+        struct dp_data {
+            uint cost;
+            uint node;
+        };
+        uint mask_size = (1 << (size - 1));
+        std::vector<dp_data> dp(mask_size * size, {UINT64_MAX, UINT64_MAX});
+        const auto dp_at = [&dp, size](uint mask, uint node) -> dp_data& {
+            assert(node <= (size - 1));
+            return dp[mask * size + node];
+        };
+        const auto mask_has = [size](uint mask, uint node) {
+            assert(node <= (size - 1));
+            return mask & (1 << node);
+        };
+        const auto node_to_mask = [size](uint node) {
+            assert(node <= (size - 1));
+            return (1 << node);
+        };
+        std::vector<uint> bitmasks(mask_size);
+        std::iota(bitmasks.begin(), bitmasks.end(), 0);
+        std::sort(bitmasks.begin(), bitmasks.end(), [](uint a, uint b){
+            return POPCOUNT(a) < POPCOUNT(b);
+        });
+        for(uint x = 0;x < bitmasks.size();x++) {
+            if(POPCOUNT(bitmasks[x]) == 2) {
+                bitmasks.erase(bitmasks.begin(), bitmasks.begin() + x);
+                break;
+            }
+        }
+        for(uint node = 0;node < (size - 1);node++) {
+            dp_at(node_to_mask(node), node) = {m_at(size - 1, node), node};
+        }
+        for(uint mask : bitmasks) {
+            assert(POPCOUNT(mask) >= 2);
+            for(uint to = 0; to < (size - 1);to++) {
+                if(!mask_has(mask, to)) {
+                    continue;
                 }
-                if(cost > answer.first) {
-                    valid = false;
+                uint best = UINT64_MAX;
+                uint node = UINT64_MAX;
+                for(uint from = 0;from < (size - 1);from++) {
+                    if((from == to) || !mask_has(mask, from)) {
+                        continue;
+                    }
+                    uint submask = mask & ~node_to_mask(to);
+                    uint cost_to_from = dp_at(submask, from).cost;
+                    uint edge_to = m_at(from, to);
+                    uint cost = cost_to_from + edge_to;
+                    if(cost < best) {
+                        best = cost;
+                        node = from;
+                    }
                 }
-            };
-            for(uint x = 0;valid && x < (size - 1); x++) {
-                add_cost(at(search[x], search[x + 1]));
+                dp_at(mask, to) = {best, node};
             }
-            if(cycle) {
-                add_cost(at(search[size - 1], search[0]));
+        }
+        uint best_last_node = UINT64_MAX;
+        uint best_last_cost = UINT64_MAX;
+        uint remaining_nodes = bitmasks.back();
+        for(uint last = 0; last < (size - 1); last++) {
+            uint cost = dp_at(remaining_nodes, last).cost + m_at(last, size - 1);
+            if(cost < best_last_cost) {
+                best_last_cost = cost;
+                best_last_node = last;
             }
-            if(valid && cost < answer.first) {
-                answer = {cost, search};
-            }
-        } while(std::next_permutation(search.begin(), search.end()));
+        }
+        std::pair<uint, std::vector<uint>> answer = {best_last_cost, {size - 1, best_last_node}};
+        uint last_node = best_last_node;
+        while(remaining_nodes != 0) {
+            uint next = dp_at(remaining_nodes, last_node).node;
+            assert(next != UINT64_MAX);
+            remaining_nodes &= ~node_to_mask(last_node);
+            answer.second.push_back(next);
+            last_node = next;
+        }
+        answer.second.back() = size - 1;
         return answer;
     }
 };
