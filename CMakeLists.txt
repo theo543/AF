@@ -105,3 +105,4 @@ add_custom_command(TARGET senat POST_BUILD
 add_executable(no_prime_sum HW3/no_prime_sum.cpp)
 add_executable(test_shortest_path_all_nodes HW3/test_shortest_path_all_nodes.cpp)
 add_executable(test_shortest_superstring HW3/test_shortest_superstring.cpp)
+add_executable(test_reconstruct_itinerary HW3/test_reconstruct_itinerary.cpp)

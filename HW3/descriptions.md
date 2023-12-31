@@ -18,7 +18,7 @@ At least 2 from each, at least 10 in total.
 
 ## Eulerian
 
-* [332-reconstruct-itinerary](https://leetcode.com/problems/reconstruct-itinerary/description/)
+* [332-reconstruct-itinerary](https://leetcode.com/problems/reconstruct-itinerary/description/) ✅
 * [2097-valid-arrangement](https://leetcode.com/problems/valid-arrangement-of-pairs/)
 * [cartite](https://www.infoarena.ro/problema/cartite)
 
