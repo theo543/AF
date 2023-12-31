@@ -550,6 +550,7 @@ public:
             }
         }
         upper_bound *= 10;
+        upper_bound = std::max(upper_bound, uint{UINT32_MAX});
         std::replace_if(matrix.begin(), matrix.end(), [](uint val) -> bool {return val == UINT64_MAX;}, upper_bound);
         struct dp_data {
             uint cost;
@@ -580,6 +581,9 @@ public:
                 break;
             }
         }
+        if(POPCOUNT(bitmasks.back()) < 2) {
+            bitmasks.clear();
+        }
         for(uint node = 0;node < (size - 1);node++) {
             dp_at(node_to_mask(node), node) = {m_at(size - 1, node), node};
         }
@@ -609,7 +613,7 @@ public:
         }
         uint best_last_node = UINT64_MAX;
         uint best_last_cost = UINT64_MAX;
-        uint remaining_nodes = bitmasks.back();
+        uint remaining_nodes = mask_size - 1;
         for(uint last = 0; last < (size - 1); last++) {
             uint cost = dp_at(remaining_nodes, last).cost + m_at(last, size - 1);
             if(cost < best_last_cost) {
