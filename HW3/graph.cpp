@@ -634,7 +634,67 @@ public:
         std::reverse(answer.second.begin(), answer.second.end());
         return answer;
     }
+
+    std::pair<uint, uint> close_eulerian_path() {
+        bool is_start_node = false;
+        bool is_end_node = false;
+        uint start_node = 0;
+        uint  end_node = 0;
+        for(uint x = 0;x < nodes.size();x++) {
+            if(nodes[x].in.size() == nodes[x].out.size()) {
+                continue;
+            }
+            if(nodes[x].in.size() == nodes[x].out.size() + 1) {
+                assert(!is_start_node);
+                is_start_node = true;
+                start_node = x;
+            }
+            if(nodes[x].in.size() + 1 == nodes[x].out.size()) {
+                assert(!is_end_node);
+                is_end_node = true;
+                end_node = x;
+            }
+        }
+        add_edge(end_node, start_node);
+        return {end_node, start_node};
+    }
+
+    std::vector<uint> eulerian_cycle(uint start = 0) {
+        std::vector<uint> cycle;
+        std::vector<uint> unfinished_nodes = {start};
+        std::vector<std::vector<edge>::iterator> next_edge(nodes.size());
+        for(uint x = 0;x < nodes.size();x++) {
+            next_edge[x] = nodes[x].out.begin();
+        }
+        while(!unfinished_nodes.empty()) {
+            uint node = unfinished_nodes.back();
+            if(next_edge[node] == nodes[node].out.end()) {
+                cycle.push_back(node);
+                unfinished_nodes.pop_back();
+            } else {
+                unfinished_nodes.push_back(next_edge[node]->dst);
+                next_edge[node]++;
+            }
+        }
+        std::reverse(cycle.begin(), cycle.end());
+        return cycle;
+    }
 };
+
+std::vector<uint> recover_eulerian_path_from_cycle(const std::vector<uint> &cycle, std::pair<uint, uint> added_edge) {
+    uint start = added_edge.first;
+    uint end = added_edge.second;
+    for(uint x = 0;x < cycle.size();x++) {
+        if(cycle[x] == start && cycle[(x + 1) % cycle.size()] == end) {
+            std::vector<uint> path;
+            path.insert(path.end(), cycle.begin() + x + 1, cycle.end());
+            path.insert(path.end(), cycle.begin(), cycle.begin() + x + 1);
+            return path;
+        }
+    }
+    assert(false);
+    return {};
+}
 
 struct bipartite_info {
     std::vector<std::pair<uint, uint>> maximum_matching;
