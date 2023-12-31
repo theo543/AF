@@ -24,6 +24,6 @@ At least 2 from each, at least 10 in total.
 
 ## Hamiltonian
 
-* [847-shortest-path](https://leetcode.com/problems/shortest-path-visiting-all-nodes/)
+* [847-shortest-path](https://leetcode.com/problems/shortest-path-visiting-all-nodes/) ✅
 * [seq](https://www.infoarena.ro/problema/seg)
 * [943-shortest-superstring](https://leetcode.com/problems/find-the-shortest-superstring/)
