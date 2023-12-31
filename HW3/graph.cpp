@@ -631,6 +631,7 @@ public:
             last_node = next;
         }
         answer.second.back() = size - 1;
+        std::reverse(answer.second.begin(), answer.second.end());
         return answer;
     }
 };
