@@ -41,7 +41,7 @@ public:
         for(const auto &t : tickets) {
             g.add_edge(airport_to_id[t.from], airport_to_id[t.to], 1);
         }
-        const auto &path = g.eulerian_cycle(start_node);
+        const auto &path = g.eulerian_path(start_node);
         std::vector<std::string> result;
         std::transform(path.begin(), path.end(), std::back_inserter(result), [&id_to_airport](uint id) {
             return id_to_airport[id];
