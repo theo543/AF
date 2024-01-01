@@ -5,6 +5,7 @@
 #include <stack>
 #include <algorithm>
 #include <numeric>
+#include <set>
 
 #define uint uint64_t
 #define sint  int64_t
@@ -635,6 +636,10 @@ public:
         return answer;
     }
 
+    /*
+     * find a valid start of an eulerian path in an undirected graph
+     * cycles just return 0 since any node would work
+     */
     uint find_eulerian_start() {
         bool is_start_node = false;
         bool is_end_node = false;
@@ -656,19 +661,39 @@ public:
         return start_node;
     }
 
-    std::vector<uint> eulerian_path(uint start = 0) {
+    /*
+     * undirected probably doesn't work with duplicate edges
+     */
+    std::vector<uint> eulerian_path(uint start = 0, bool undirected = false) {
+        const auto sort_edge = [](const edge &edge) -> std::pair<uint, uint> {
+            if(edge.src > edge.dst) {
+                return {edge.dst, edge.src};
+            } else {
+                return {edge.src, edge.dst};
+            }
+        };
+
         std::vector<uint> cycle;
         std::vector<uint> unfinished_nodes = {start};
+        std::set<std::pair<uint, uint>> used_edges;
         std::vector<std::vector<edge>::iterator> next_edge(nodes.size());
         for(uint x = 0;x < nodes.size();x++) {
             next_edge[x] = nodes[x].out.begin();
         }
         while(!unfinished_nodes.empty()) {
             uint node = unfinished_nodes.back();
+            if(undirected) {
+                while(next_edge[node] != nodes[node].out.end() && used_edges.find(sort_edge(*next_edge[node])) != used_edges.end()) {
+                    next_edge[node]++;
+                }
+            }
             if(next_edge[node] == nodes[node].out.end()) {
                 cycle.push_back(node);
                 unfinished_nodes.pop_back();
             } else {
+                if(undirected) {
+                    used_edges.insert(sort_edge(*next_edge[node]));
+                }
                 unfinished_nodes.push_back(next_edge[node]->dst);
                 next_edge[node]++;
             }

@@ -107,3 +107,8 @@ add_executable(test_shortest_path_all_nodes HW3/test_shortest_path_all_nodes.cpp
 add_executable(test_shortest_superstring HW3/test_shortest_superstring.cpp)
 add_executable(test_reconstruct_itinerary HW3/test_reconstruct_itinerary.cpp)
 add_executable(test_valid_arrangement_of_pairs HW3/test_valid_arrangement_of_pairs.cpp)
+add_executable(cartite HW3/cartite.cpp)
+add_custom_command(TARGET cartite POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/HW3/cartite.in ${CMAKE_CURRENT_BINARY_DIR}/cartite.in
+)
