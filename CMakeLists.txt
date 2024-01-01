@@ -7,7 +7,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -g")
 include(CheckCXXSourceCompiles)
 set(CMAKE_REQUIRED_FLAGS "-fsanitize=address,undefined")
 check_cxx_source_compiles("#include <iostream>\nint main() { int arr[3] = {1, 2, 3}; int index; std::cin >> index; std::cout << arr[index]; return 0; }" SANITIZERS_SUPPORTED)
-if(SANITIZERS_SUPPORTED)
+option(USE_SANITIZERS "Enable sanitizers if supported" ON)
+if(USE_SANITIZERS AND SANITIZERS_SUPPORTED)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address,undefined")
     message(STATUS "Sanitizers enabled")
     add_compile_options(-fsanitize=address,undefined)
@@ -111,4 +112,9 @@ add_executable(cartite HW3/cartite.cpp)
 add_custom_command(TARGET cartite POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/HW3/cartite.in ${CMAKE_CURRENT_BINARY_DIR}/cartite.in
+)
+add_executable(seg HW3/seg.cpp)
+add_custom_command(TARGET seg POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/HW3/seg.in ${CMAKE_CURRENT_BINARY_DIR}/seg.in
 )
