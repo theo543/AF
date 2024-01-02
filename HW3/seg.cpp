@@ -40,9 +40,8 @@ double solve_test(std::ifstream &in) {
     point segs[max_nodes][2];
     int n;
 
-    std::fill(&dp_dist[0][0][0], &dp_dist[0][0][0] + sizeof(dp_dist)/sizeof(double), std::numeric_limits<double>::infinity());
-
     in >> n;
+
     for(int x = 0;x < n;x++) {
         in >> segs[x][0].x >> segs[x][0].y >> segs[x][1].x >> segs[x][1].y;
     }
@@ -51,12 +50,14 @@ double solve_test(std::ifstream &in) {
         return 0;
     }
 
+    unsigned int masks = 1 << (n - 1);
+    std::fill(&dp_dist[0][0][0], &dp_dist[0][0][0] + masks * (max_nodes - 1) * 2, std::numeric_limits<double>::infinity());
+
     for(int x = 0;x < n - 1;x++) {
         dp_dist[1 << x][x][1] = dist(segs[x][0], segs[n - 1][0]);
         dp_dist[1 << x][x][0] = dist(segs[x][1], segs[n - 1][0]);
     }
 
-    unsigned int masks = 1 << (n - 1);
     unsigned int bitmasks[max_masks + 1];
     std::iota(bitmasks, bitmasks + masks, 0);
     std::sort(bitmasks, bitmasks + masks, [](unsigned int b1, unsigned int b2){return POPCOUNT(b1) < POPCOUNT(b2);});
