@@ -123,3 +123,8 @@ add_custom_command(TARGET iepuri POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/etc/iepuri.in ${CMAKE_CURRENT_BINARY_DIR}/iepuri.in
 )
+add_executable(power etc/power.cpp)
+add_custom_command(TARGET power POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/etc/power.in ${CMAKE_CURRENT_BINARY_DIR}/power.in
+)
