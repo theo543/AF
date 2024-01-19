@@ -118,3 +118,8 @@ add_custom_command(TARGET seg POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/HW3/seg.in ${CMAKE_CURRENT_BINARY_DIR}/seg.in
 )
+add_executable(iepuri etc/iepuri.cpp)
+add_custom_command(TARGET iepuri POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_CURRENT_SOURCE_DIR}/etc/iepuri.in ${CMAKE_CURRENT_BINARY_DIR}/iepuri.in
+)
